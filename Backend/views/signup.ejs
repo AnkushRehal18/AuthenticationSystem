@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Sign Up</title>
+    <script>
+        function validateForm(event) {
+            const email = document.forms["signupForm"]["email"].value;
+            const password = document.forms["signupForm"]["password"].value;
+
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (!emailPattern.test(email)) {
+                alert("Please enter a valid email address.");
+                event.preventDefault();
+                return false;
+            }
+
+            if (password.length < 8) {
+                alert("Password must be at least 8 characters long.");
+                event.preventDefault();
+                return false;
+            }
+
+            return true;
+        }
+    </script>
+</head>
+
+<body>
+    <h1>Register</h1>
+
+    <form name="signupForm" action="/signup" method="POST" onsubmit="validateForm(event)">
+        <label>Username:</label>
+        <input type="text" name="username" required /><br><br>
+
+        <label>Email:</label>
+        <input type="email" name="email" required /><br><br>
+
+        <label>Password:</label>
+        <input type="password" name="password" required /><br><br>
+
+        <button type="submit">Sign Up</button>
+    </form>
+
+    <p>Already have an account? <a href="/login">Login here</a></p>
+
+    <% if (typeof error !== 'undefined') { %>
+        <p style="color: red;"><%= error %></p>
+    <% } %>
+
+    <% if (typeof message !== 'undefined') { %>
+        <p style="color: green;"><%= message %></p>
+    <% } %>
+</body>
+
+</html>

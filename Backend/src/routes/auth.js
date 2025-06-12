@@ -4,6 +4,15 @@ const validateSignupData = require("../utils/Validation");
 const { ConnectDb } = require("../config/database");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken")
+const axios = require("axios")
+
+authRouter.get("/", (req, res) => {
+    res.redirect("/signup");
+});
+
+authRouter.get("/signup", (req, res) => {
+    res.render("signup");
+});
 
 authRouter.post("/signup", async (req, res) => {
     try {
@@ -28,20 +37,44 @@ authRouter.post("/signup", async (req, res) => {
             [username, email, hashPassword]
         );
 
-        return res.status(201).json({
-            message: "Registration successful. Please log in.",
-            user: result.rows[0]
+        return res.render("signup", {
+            message: "Registration successful. Please Log in"
         });
 
     }
     catch (err) {
-        res.status(400).send("Error" + err)
+        res.render("signup", { error: "An error occurred during registration." });
     }
 });
 
+authRouter.get("/login", (req, res) => {
+    res.render("login");
+});
+
+
 authRouter.post("/login", async (req, res) => {
-    const { email, password } = req.body;
+    const { email, password, "g-recaptcha-response": recaptchaToken } = req.body;
+
+    if (!recaptchaToken) {
+        return res.render("login", { error: "Please complete the reCAPTCHA." });
+    }
+
     try {
+        const captchaVerifyUrl = `https://www.google.com/recaptcha/api/siteverify`;
+
+        const response = await axios.post(captchaVerifyUrl, null, {
+            params: {
+                secret: process.env.RECAPTCHA_SECRET_KEY,
+                response: recaptchaToken
+            }
+        });
+
+        const { success } = response.data;
+
+        if (!success) {
+            return res.render("login", { error: "Invalid reCAPTCHA. Please try again." });
+        };
+
         const client = await ConnectDb();
 
         const result = await client.query(
@@ -70,20 +103,21 @@ authRouter.post("/login", async (req, res) => {
             { expiresIn: "15m" }
         );
 
-        res.cookie("token",token);
-        res.status(200).json({message :"Login successful",user})
+        res.cookie("token", token);
+        return res.redirect("/profile");
 
     }
     catch (err) {
-        res.status(400).send("Error" + err);
+        console.error(err);
+        return res.render("login", { error: "Something went wrong. Try again." });
     }
 })
 
-authRouter.post("/logout", async(rq,res)=>{
-    res.cookie("token",null,{
+authRouter.post("/logout", async (rq, res) => {
+    res.cookie("token", null, {
         expires: new Date(Date.now())
     });
 
-    res.status(200).send("Logged Out successfully")
+    res.redirect("/login");
 })
 module.exports = authRouter

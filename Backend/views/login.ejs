@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+</head>
+<body>
+    <h1>Login</h1>
+
+    <form action="/login" method="POST">
+        <label>Email:</label>
+        <input type="email" name="email" required><br><br>
+
+        <label>Password:</label>
+        <input type="password" name="password" required><br><br>
+
+        <!-- adding the captcha -->
+
+        <!-- <div class="g-recaptcha" data-sitekey="6Lc-sF0rAAAAABzpVF13EANRHXkL-Wp42hqNkjRh"></div><br> -->
+        <div class="g-recaptcha" data-sitekey="6Lc-sF0rAAAAABzpVF13EANRHXkL-Wp42hqNkjRh"></div><br>
+
+
+        <button type="submit">Login</button>
+        <button type="submit"><a href="/signup">Signup</a></button>
+    </form>
+
+    <% if (typeof error !== 'undefined') { %>
+        <p style="color: red;"><%= error %></p>
+    <% } %>
+</body>
+</html>
