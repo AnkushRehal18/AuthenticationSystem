@@ -4,10 +4,10 @@ const passwordValidator = require('password-validator');
 const schema = new passwordValidator();
 
 schema
-.is().min(8)                                    // Minimum length 8
-.has().uppercase()                              // Must have uppercase letters
-.has().lowercase()                              // Must have lowercase letters
-.has().digits(2)                                // Must have at least 2 digits
+.is().min(8)                          
+.has().uppercase()                              
+.has().lowercase()                            
+.has().digits(2)                               
 
 const ValidateSignupData = (req)=>{
     const {username, email, password} = req.body;
